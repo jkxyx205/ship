@@ -15,7 +15,5 @@ public interface UserService {
      */
     void registerUser(User user, Company company);
 
-    Employee findEmployeeById(Long id);
 
-    Employee save(Employee employee);
 }

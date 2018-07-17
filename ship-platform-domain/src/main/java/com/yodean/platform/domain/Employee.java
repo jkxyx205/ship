@@ -3,6 +3,7 @@ package com.yodean.platform.domain;
 import com.yodean.common.domain.EntityData;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -21,11 +22,6 @@ public class Employee extends EntityData {
      * 姓名
      */
     private String name;
-
-    /**
-     * 电话
-     */
-    private String tel;
 
     /**
      * 邮箱
@@ -67,4 +63,17 @@ public class Employee extends EntityData {
 
     @Transient
     private Long[] orgIds;
+
+    @PreUpdate
+    @PrePersist
+    private void initData() {
+        if (departments.isEmpty() && ArrayUtils.isNotEmpty(orgIds)) {
+            for (Long id: orgIds) {
+                Department department = new Department();
+                department.setId(id);
+                departments.add(department);
+            }
+        }
+    }
+
 }

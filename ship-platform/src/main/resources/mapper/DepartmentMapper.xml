@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yodean.platform.user.mapper.DepartmentMapper">
+
+<select id="countEmployeeByDepartmentId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    SELECT count(*) c from sys_dept_emp de where de.department_id in
+    (
+    select id as deptId from sys_department list WHERE
+    exists (
+    select 1 from sys_department d WHERE d.id = :id and list.path like CONCAT(d.path,d.id,"/%")
+    )
+    or list.id = :id2)
+
+</select>
+
+</mapper>

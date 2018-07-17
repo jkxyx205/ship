@@ -1,4 +1,4 @@
-package com.yodean.platform.user;
+package com.yodean.platform.user.dto;
 
 import com.yodean.platform.domain.Company;
 import com.yodean.platform.domain.User;

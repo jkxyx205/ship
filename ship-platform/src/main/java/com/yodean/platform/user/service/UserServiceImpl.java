@@ -10,7 +10,6 @@ import com.yodean.platform.domain.User;
 import com.yodean.platform.user.repository.DepartmentRepository;
 import com.yodean.platform.user.repository.EmployeeRepository;
 import com.yodean.platform.user.repository.UserRepository;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +53,7 @@ public class UserServiceImpl implements UserService {
         Employee admin = new Employee();
         admin.setName(user.getNickname());
         admin.setUser(user);
+        admin.setLeader(false);
 
         admin.getDepartments().add(rootDept);
         rootDept.getEmployees().add(admin);
@@ -63,27 +63,5 @@ public class UserServiceImpl implements UserService {
 
         // 新建公司
         companyRepository.save(company);
-    }
-
-    @Override
-    public Employee findEmployeeById(Long id) {
-        return employeeRepository.getOne(id);
-    }
-
-    @Override
-    public Employee save(Employee employee) {
-
-        if (ArrayUtils.isNotEmpty(employee.getOrgIds())) {
-            for (Long orgId : employee.getOrgIds()) {
-                employee.getDepartments().add(findDepartmentById(orgId));
-            }
-
-        }
-        employeeRepository.save(employee);
-        return employee;
-    }
-
-    public Department findDepartmentById(Long id) {
-        return departmentRepository.getOne(id);
     }
 }

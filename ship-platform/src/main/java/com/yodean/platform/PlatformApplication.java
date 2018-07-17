@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Created by rick on 7/16/18.
  */
 @SpringBootApplication
-@MapperScan("com.yodean.platform")
+@MapperScan("com.yodean.platform.*.mapper")
 public class PlatformApplication {
 
     public static void main(String[] args) {
