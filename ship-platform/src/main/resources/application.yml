@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/platform?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: jkxyx205
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+    database: mysql
+
+server:
+  port: 8100
+  servlet:
+    context-path: /platform
+
+mybatis:
+  type-aliases-package: com.yodean.platform.domain
+  config-locations: classpath*:mybatis-config.xml
+  mapper-locations: mapper/*.xml
