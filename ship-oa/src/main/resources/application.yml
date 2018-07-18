@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/cas?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/ship?useUnicode=true&characterEncoding=UTF-8
     username: root
     password: jkxyx205
   jpa:
@@ -11,16 +11,23 @@ spring:
     show-sql: true
     properties:
       hibernate.format_sql: true
+  jackson:
+      date-format: yyyy-MM-dd HH:mm:ss
+      joda-date-time-format: yyyy-MM-mm HH:mm:ss
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 50MB
 server:
-  port: 8100
+  port: 8200
   servlet:
     context-path: /oa
 
 
-client:
-  remote:
-    service:
-      url: http://127.0.0.1:8000/api/remoteService
+configuration:
+  document: /Users/rick/jkxyx205/tmp/oa #文件上传根路径
+  cdn: http://127.0.0.1:3000         #nginx静态服务器
+  tmp: /Users/rick/jkxyx205/tmp/tmp     #临时目录
 
 
 

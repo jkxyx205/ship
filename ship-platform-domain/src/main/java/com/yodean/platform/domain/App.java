@@ -1,6 +1,6 @@
 package com.yodean.platform.domain;
 
-import com.yodean.common.domain.EntityData;
+import com.yodean.common.domain.BaseEntity;
 import lombok.Data;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 //@Entity
 //@Table(name = "sys_app")
-public class App extends EntityData {
+public class App extends BaseEntity {
 
     private String name;
 

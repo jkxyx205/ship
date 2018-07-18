@@ -1,9 +1,12 @@
 package com.yodean.platform.domain;
 
-import com.yodean.common.domain.EntityData;
+import com.yodean.common.domain.BaseEntity;
+import com.yodean.dictionary.DictJpaConverter;
+import com.yodean.dictionary.entity.Dict;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
@@ -18,7 +21,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @Entity
 @Table(name="sys_user")
-public class User extends EntityData {
+public class User extends BaseEntity {
     /**
      * 用户昵称
      */
@@ -45,7 +48,8 @@ public class User extends EntityData {
     /**
      * 性别
      */
-    private Character sex;
+    @Convert(converter = DictJpaConverter.class)
+    private Dict sex;
 
     @NotBlank
     private String salt;

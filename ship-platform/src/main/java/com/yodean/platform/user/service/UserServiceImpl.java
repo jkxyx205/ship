@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         // 添加注册用户
         user.setLocked(false);
         user.setSalt("xxxxxx");
-        user.setSex('2');
+//        user.setSex('2');
         userRepository.save(user);
 
         // 创建部门

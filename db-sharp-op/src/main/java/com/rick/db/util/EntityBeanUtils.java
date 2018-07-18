@@ -3,7 +3,7 @@ package com.rick.db.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rick.db.exception.DBException;
-import com.yodean.common.domain.EntityData;
+import com.yodean.common.domain.BaseEntity;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.beanutils.PropertyUtilsBean;
@@ -107,14 +107,14 @@ public class EntityBeanUtils {
                         Map<Long, Object> srcMapping = new HashMap<>(srcCollection.size());
 
                         for (Object objSrc : srcCollection) {
-                            srcMapping.put(((EntityData)(objSrc)).getId(), objSrc); //主键id
+                            srcMapping.put(((BaseEntity)(objSrc)).getId(), objSrc); //主键id
                             srcMapping.put((long) objSrc.hashCode(), objSrc); //hashCode
                         }
 
                         for (Object objSub : objCollection) {
                             if (srcCollection.contains(objSub)) { //存在合并
 
-                                Long id = ((EntityData)(objSub)).getId();
+                                Long id = ((BaseEntity)(objSub)).getId();
 
                                 if (Objects.isNull(id))
                                     id = (long)objSub.hashCode();
@@ -136,7 +136,7 @@ public class EntityBeanUtils {
                                 logger.info("Remove entity [{}] property [{}] with [{}]", src.getClass(), name, objSrc);
                             }
                         }
-                    } else if (EntityData.class.isAssignableFrom(type) && isNotIgnoreObject(src.getClass(), name)){// Entity Object
+                    } else if (BaseEntity.class.isAssignableFrom(type) && isNotIgnoreObject(src.getClass(), name)){// Entity Object
                         merge(srcPropertyValue, objPropertyValue, deep, setValueable);
                     }
                 }

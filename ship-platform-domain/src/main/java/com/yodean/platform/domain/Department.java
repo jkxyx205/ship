@@ -1,6 +1,6 @@
 package com.yodean.platform.domain;
 
-import com.yodean.common.domain.EntityData;
+import com.yodean.common.domain.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "sys_department")
-public class Department extends EntityData {
+public class Department extends BaseEntity {
 
     /**
      * 部门名称

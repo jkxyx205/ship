@@ -2,7 +2,6 @@ package com.yodean.platform;
 
 import com.rick.db.service.BaseService;
 import com.yodean.platform.domain.User;
-import com.yodean.platform.user.mapper.UserMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,8 @@ public class UserTest {
     private BaseService baseService;
 
 
-    @Autowired
-    private UserMapper userMapper;
+//    @Autowired
+//    private UserMapper userMapper;
 
 
     @Test
@@ -42,7 +41,7 @@ public class UserTest {
     public void testFindUser() {
         User user = new User();
 
-        user = userMapper.selectOne(user);
+//        user = userMapper.selectOne(user);
 
         System.out.println("->" + user.getNickname() + ": " + user.getDelFlag().name());
     }

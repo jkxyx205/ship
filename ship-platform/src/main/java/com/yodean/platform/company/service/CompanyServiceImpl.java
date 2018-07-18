@@ -167,7 +167,7 @@ public class CompanyServiceImpl implements CompanyService {
                 user.setNickname(employee.getName());
                 user.setLocked(false);
                 user.setPassword("123456");
-                user.setSex('2');
+//                user.setSex('2');
                 user.setSalt("2323");
                 user.setTel(tel);
 

@@ -3,10 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ship-commons</artifactId>
+        <artifactId>sharp-server-dependencies</artifactId>
         <groupId>com.yodean</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../ship-commons/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -33,13 +32,32 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.8</version>
+        </dependency>
         <!-- Project Begin -->
+        <dependency>
+            <groupId>com.yodean</groupId>
+            <artifactId>ship-platform-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.rick.db</groupId>
+            <artifactId>db-sharp-op</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Project End -->
+
         <!--<dependency>-->
             <!--<groupId>com.yodean</groupId>-->
             <!--<artifactId>ship-cas-client</artifactId>-->
             <!--<version>1.0-SNAPSHOT</version>-->
         <!--</dependency> -->
-        <!-- Project End -->
+
     </dependencies>
 
 
