@@ -5,7 +5,6 @@ import com.yodean.platform.api.company.vo.EmployeeVO;
 import com.yodean.platform.domain.Department;
 import com.yodean.platform.domain.Employee;
 
-import java.util.List;
 import java.util.Set;
 
 /**

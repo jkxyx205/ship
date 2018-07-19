@@ -1,13 +1,11 @@
 package com.yodean.oa.module.inbox.entity;
 
-import com.yodean.common.domain.BaseEntity;
 import com.yodean.oa.module.inbox.ItemStatus;
 import com.yodean.oa.module.inbox.ItemType;
-import com.yodean.platform.domain.Employee;
+import com.yodean.platform.domain.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -54,7 +52,6 @@ public class UserInbox extends BaseEntity {
     @Column(length = 1)
     private Boolean readed;
 
-
     /**
      * 授权对象类型
      */
@@ -97,10 +94,16 @@ public class UserInbox extends BaseEntity {
     private void PrePersist() {
         setItemStatus(ItemStatus.INBOX);
         setFollow(false);
-        setReaded(false);
+
+        if(ItemType.NOTE == itemType)
+            setReaded(true);
+        else
+            setReaded(false);
+
         if (Objects.isNull(userType))
             setUserType(UserType.MUST);
     }
+
 
     @Override
     public boolean equals(Object o) {

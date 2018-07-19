@@ -1,7 +1,7 @@
 package com.yodean.platform.dict.service;
 
 import com.google.common.collect.Maps;
-import com.rick.db.service.BaseService;
+import com.rick.db.service.JdbcService;
 import com.yodean.dictionary.entity.Dict;
 import com.yodean.dictionary.service.DictService;
 import com.yodean.platform.dict.repository.DictRepository;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,7 @@ public class DictServiceImpl implements DictService {
     private static final String QUERY_ID_SQL = "select id, category, name, description from sys_dictionary where id = :id";
 
     @Resource
-    private BaseService sharpService;
+    private JdbcService sharpService;
 
     @Autowired
     private DictRepository dictRepository;

@@ -1,12 +1,9 @@
 package com.yodean.platform.dict;
 
-import com.yodean.platform.domain.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by rick on 7/18/18.

@@ -1,6 +1,5 @@
 package com.yodean.platform.domain;
 
-import com.yodean.common.domain.BaseEntity;
 import com.yodean.dictionary.DictJpaConverter;
 import com.yodean.dictionary.entity.Dict;
 import lombok.Getter;

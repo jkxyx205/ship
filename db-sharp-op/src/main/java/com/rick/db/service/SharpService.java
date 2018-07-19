@@ -1,6 +1,7 @@
 package com.rick.db.service;
 
 import com.rick.db.util.SqlFormatter;
+import lombok.Getter;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class SharpService {
     private static Logger logger = LoggerFactory.getLogger(SharpService.class);
 
     @Resource
+    @Getter
     private JdbcTemplate jdbcTemplate;
 
     @Resource

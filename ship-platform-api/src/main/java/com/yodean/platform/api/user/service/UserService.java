@@ -1,7 +1,6 @@
 package com.yodean.platform.api.user.service;
 
 import com.yodean.platform.domain.Company;
-import com.yodean.platform.domain.Employee;
 import com.yodean.platform.domain.User;
 
 /**

@@ -4,13 +4,12 @@ import com.yodean.common.dto.Result;
 import com.yodean.common.util.ResultUtils;
 import com.yodean.platform.api.company.service.CompanyService;
 import com.yodean.platform.api.company.vo.DepartmentVO;
+import com.yodean.platform.api.company.vo.EmployeeVO;
 import com.yodean.platform.domain.Department;
 import com.yodean.platform.domain.Employee;
-import com.yodean.platform.api.company.vo.EmployeeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,7 +57,7 @@ public class CompanyController {
      * @return
      */
     @GetMapping("/departments/{id}/employees")
-    public Result<List<EmployeeVO>> findEmployeeByDepartmentId(@PathVariable long id) {
+    public Result<Set<EmployeeVO>> findEmployeeByDepartmentId(@PathVariable long id) {
         Set<EmployeeVO> list = companyService.findEmployeeByDepartmentId(id);
         return ResultUtils.success(list);
     }

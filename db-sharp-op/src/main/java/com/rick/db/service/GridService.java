@@ -32,7 +32,8 @@ public class GridService extends SharpService {
 
         //获取纪录
 
-        List<?> rows = query(sql, param, new SharpService.JdbcTemplateCallback<List<T>>() {
+        List<?> rows = query(sql, param, new SharpService.JdbcTemplateCallback<List<T>>(){
+
             @Override
             public List query(JdbcTemplate jdbcTemplate, String sql, Object[] args) {
                 //change add 20170223
@@ -43,7 +44,6 @@ public class GridService extends SharpService {
                 }
                 //end
 
-                //return jdbcTemplate.queryForList(sql, args);
                 if (clazz == Map.class)
                     return jdbcTemplate.query(sql, args, new ColumnMapExtRowMapper());
                 else

@@ -1,6 +1,5 @@
 package com.yodean.platform.domain;
 
-import com.yodean.common.domain.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -8,6 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+
 
 /**
  * Created by rick on 7/16/18.

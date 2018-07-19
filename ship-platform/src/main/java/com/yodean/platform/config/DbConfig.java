@@ -1,6 +1,6 @@
 package com.yodean.platform.config;
 
-import com.rick.db.service.BaseService;
+import com.rick.db.service.JdbcService;
 import com.yodean.common.enums.DelFlag;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * Created by rick on 7/17/18.
  */
 @Configuration
-@ImportAutoConfiguration({BaseService.class})
+@ImportAutoConfiguration({JdbcService.class})
 public class DbConfig {
 
     @Autowired

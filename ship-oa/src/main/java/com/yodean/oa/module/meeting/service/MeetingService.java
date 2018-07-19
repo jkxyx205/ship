@@ -1,52 +1,49 @@
 package com.yodean.oa.module.meeting.service;
 
-import com.rick.db.util.EntityBeanUtils;
-import com.yodean.common.util.JacksonUtils;
-import com.yodean.oa.common.plugin.document.enums.DocumentCategory;
-import com.yodean.oa.common.plugin.document.service.DocumentService;
+import com.yodean.common.enums.DelFlag;
+import com.yodean.oa.common.core.service.BaseService;
+import com.yodean.oa.module.inbox.ItemType;
+import com.yodean.oa.module.inbox.service.UserInboxService;
 import com.yodean.oa.module.meeting.entity.Meeting;
 import com.yodean.oa.module.meeting.repository.MeetingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by rick on 7/18/18.
  */
 @Service
-public class MeetingService {
+public class MeetingService extends BaseService<Meeting> {
     @Autowired
     private MeetingRepository meetingRepository;
 
     @Autowired
-    private DocumentService documentService;
+    private UserInboxService userInboxService;
+
+
+    @Override
+    protected JpaRepository<Meeting, Long> autowired() {
+        return meetingRepository;
+    }
 
     @Transactional
     public Meeting save(Meeting meeting) {
-        //参数格式化
-        meeting.initData();
-
-        if (Objects.nonNull(meeting.getId())) { //修改
-            Meeting persist = meetingRepository.findById(meeting.getId()).get();
-
-            EntityBeanUtils.merge(persist, meeting, true);
-            meeting = persist;
-        }
-
-        meetingRepository.save(meeting);
-
-//        documentService.update(meeting.getDocIds(), DocumentCategory.MEETING, meeting.getId());
+        super.saveCascade(meeting);
+        userInboxService.tipAll(ItemType.MEETING, meeting.getId());
         return meeting;
     }
 
-    public Meeting findById(Long id) {
-        Meeting meeting = meetingRepository.getOne(id);
-        meeting.setLabelList(JacksonUtils.readValue(meeting.getLabels(), List.class));
-
-        return meeting;
+    /**
+     * 取消
+     * @param id
+     */
+    public void cancelById(Long id) {
+        Meeting task = meetingRepository.getOne(id);
+        task.setDelFlag(DelFlag.DEL_FLAG_REMOVE);
+        meetingRepository.save(task);
     }
 
 }

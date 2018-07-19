@@ -12,7 +12,7 @@ public final class ResultUtils {
         return success(null);
     }
 
-    public static <T> Result success(T data) {
+    public static <T> Result<T> success(T data) {
         Result<T> result = new Result();
         result.setData(data);
         result.setCode(ResultCode.SUCCESS.getCode());
@@ -20,19 +20,19 @@ public final class ResultUtils {
         return result;
     }
 
-    public static Result error(String msg) {
+    public static Result<String> error(String msg) {
         return error(ResultCode.UNKNOW_ERROR.getCode(), msg);
     }
 
-    public static Result error(Integer code, String msg) {
+    public static Result<String> error(Integer code, String msg) {
         return error(code, msg, null);
     }
 
-    public static Result error(ResultCode resultCode) {
+    public static Result<String> error(ResultCode resultCode) {
         return error(resultCode.getCode(), resultCode.getMessage(), null);
     }
 
-    public static Result error(ResultCode resultCode, Object data) {
+    public static <T> Result<T> error(ResultCode resultCode, T data) {
         return error(resultCode.getCode(), resultCode.getMessage(), data);
     }
 

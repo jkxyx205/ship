@@ -1,12 +1,10 @@
 package com.yodean.oa.common.plugin.document.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.yodean.common.domain.BaseEntity;
-
-
 import com.yodean.oa.common.Global;
 import com.yodean.oa.common.plugin.document.enums.DocumentCategory;
 import com.yodean.oa.common.plugin.document.enums.FileType;
+import com.yodean.platform.domain.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
@@ -72,7 +70,7 @@ public class Document extends BaseEntity {
         if (StringUtils.isEmpty(this.getExt()))
             return this.name;
 
-        return this.name + "." + this.getExt();
+        return this.name + (StringUtils.isEmpty(this.getExt()) ? "" : "." + this.getExt());
     }
 
     /***
@@ -92,6 +90,6 @@ public class Document extends BaseEntity {
      */
     public String getUrlPath() {
         if (FileType.FOLDER == this.fileType) return null;
-        return Global.CDN + "/" + path + "." + ext;
+        return Global.CDN + "/" + path + (StringUtils.isEmpty(this.getExt()) ? "" : "." + this.getExt());
     }
 }

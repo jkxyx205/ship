@@ -8,6 +8,7 @@ import java.util.Map;
  * Created by rick on 2017/7/27.
  */
 public class ColumnMapExtRowMapper extends ColumnMapRowMapper {
+
     @Override
     protected Map<String, Object> createColumnMap(int columnCount) {
         return new LinkedCaseInsensitiveExtMap(columnCount);

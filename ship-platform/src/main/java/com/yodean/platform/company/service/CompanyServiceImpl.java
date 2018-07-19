@@ -2,12 +2,12 @@ package com.yodean.platform.company.service;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.rick.db.service.BaseService;
-import com.rick.db.util.EntityBeanUtils;
+import com.rick.db.service.JdbcService;
 import com.yodean.common.enums.DelFlag;
 import com.yodean.platform.api.company.service.CompanyService;
 import com.yodean.platform.api.company.vo.DepartmentVO;
 import com.yodean.platform.api.company.vo.EmployeeVO;
+import com.yodean.platform.api.util.EntityBeanUtils;
 import com.yodean.platform.company.repository.CompanyRepository;
 import com.yodean.platform.domain.Department;
 import com.yodean.platform.domain.Employee;
@@ -40,7 +40,7 @@ public class CompanyServiceImpl implements CompanyService {
     private UserRepository userRepository;
 
     @Autowired
-    private BaseService baseService;
+    private JdbcService baseService;
 
 
 

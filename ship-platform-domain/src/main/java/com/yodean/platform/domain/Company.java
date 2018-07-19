@@ -1,6 +1,5 @@
 package com.yodean.platform.domain;
 
-import com.yodean.common.domain.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -9,7 +9,6 @@ public enum  DocumentCategory {
     MEETING("会议"),
     NOTE("便签"),
     NOTICE("通知"),
-    NEWS("新闻"),
     DISK_ME("资料库-我的"),
     DISK_SHARE("资料库-共享"),
     DISK_COMPANY("资料库-公司")

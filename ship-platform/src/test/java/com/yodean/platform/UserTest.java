@@ -1,6 +1,6 @@
 package com.yodean.platform;
 
-import com.rick.db.service.BaseService;
+import com.rick.db.service.JdbcService;
 import com.yodean.platform.domain.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +18,7 @@ import java.util.List;
 public class UserTest {
 
     @Autowired
-    private BaseService baseService;
+    private JdbcService baseService;
 
 
 //    @Autowired

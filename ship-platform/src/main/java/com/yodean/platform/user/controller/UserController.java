@@ -5,7 +5,10 @@ import com.yodean.common.util.ResultUtils;
 import com.yodean.platform.api.user.service.UserService;
 import com.yodean.platform.user.dto.RegisterUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by rick on 7/16/18.
