@@ -17,11 +17,17 @@ public abstract class BaseService<T extends BaseEntity> {
 
     abstract protected JpaRepository<T, Long> autowired();
 
-    public T save(T t) {
+    public T singleEntitySave(T t) {
         return saveEntity(t, false);
     }
 
-    public T saveCascade(T t) {
+    /**
+     * 有映射关系的实体，如@ManyToMany @OneToMany
+     * 需要级联合并属性
+     * @param t
+     * @return
+     */
+    public T multiEntitySave(T t) {
         return saveEntity(t, true);
     }
 

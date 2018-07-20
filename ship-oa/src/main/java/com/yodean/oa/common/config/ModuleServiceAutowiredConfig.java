@@ -9,5 +9,5 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ImportAutoConfiguration({JdbcService.class})
-public class DbConfig {
+public class ModuleServiceAutowiredConfig {
 }

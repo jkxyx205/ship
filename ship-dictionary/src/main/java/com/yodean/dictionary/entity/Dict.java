@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.yodean.common.enums.DelFlag;
+import com.yodean.common.util.IDUtils;
 import com.yodean.dictionary.DictDeserializer;
 import lombok.Data;
 
@@ -48,11 +49,6 @@ public class Dict {
     @Column(name = "del_flag", nullable = false)
     private DelFlag delFlag;
 
-
-
-
-
-
     private String category;
 
     private String name;
@@ -72,11 +68,24 @@ public class Dict {
     private Long parentId;
 
     @PrePersist
-//    @PreUpdate
     private void initData() {
         if (Objects.isNull(parentDict) && Objects.nonNull(parentId)) {
             parentDict = new Dict();
             parentDict.setId(parentId);
         }
+
+        Date now = new Date();
+
+        if (this.getId() == null) {
+            this.setId(IDUtils.genItemId());
+            this.setCreateBy(0L);
+            this.setCreateDate(now);
+        }
+
+        this.setDelFlag(DelFlag.DEL_FLAG_NORMAL);
+
+        this.setUpdateBy(0L);
+        this.setUpdateDate(now);
+
     }
 }

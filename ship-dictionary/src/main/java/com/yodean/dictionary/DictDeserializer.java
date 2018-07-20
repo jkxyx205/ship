@@ -16,6 +16,16 @@ public class DictDeserializer extends JsonDeserializer<Dict> {
     @Override
     public Dict deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         JsonNode node = jp.getCodec().readTree(jp);
-        return DictionaryUtils.idConvert2Dict(Long.parseLong(node.asText()));
+        String text = node.asText();
+        if (text.matches("[0-9]+")) {
+            return DictionaryUtils.idConvert2Dict(Long.parseLong(node.asText()));
+        } else {
+            Dict dict = new Dict();
+            dict.setCategory("SYSTEM");
+            dict.setName("UNKNOWN");
+            dict.setDescription("位置类型");
+            return dict;
+        }
+
     }
 }

@@ -23,7 +23,7 @@ public class NoteService extends BaseService<Note> {
     }
 
 
-    @Override
+
     public Note save(Note note) {
         // TODO userList 不从界面传入，设置当前用户
 //
@@ -31,6 +31,6 @@ public class NoteService extends BaseService<Note> {
         userInbox.setAuthorityId(UserUtils.getCurrentEmployee().getId());
         note.getUserList().add(userInbox);
 
-        return super.saveCascade(note);
+        return super.multiEntitySave(note);
     }
 }

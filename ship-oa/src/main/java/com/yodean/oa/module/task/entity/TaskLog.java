@@ -25,5 +25,4 @@ public class TaskLog extends BaseEntity {
     @JoinColumn(name = "task_id", referencedColumnName = "id", nullable = false)
     @JsonIgnore
     private Task task;
-
 }

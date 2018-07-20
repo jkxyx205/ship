@@ -1,7 +1,6 @@
 package com.yodean.platform.api.util;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yodean.platform.domain.BaseEntity;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -74,31 +73,27 @@ public class EntityBeanUtils {
 
             Class<?> type = propertyDescriptor.getPropertyType();
 
-
-
             try {
                 Object srcPropertyValue = propertyUtilsBean.getProperty(src, name);
                 Object objPropertyValue = propertyUtilsBean.getProperty(obj, name);
 
-                if (srcPropertyValue == null) {
+                if (isMappingJavaType(type)) { //"基本"数量类型
+                    if (setValueable.beforeSetProperty(src, name, srcPropertyValue, objPropertyValue)) {
+                        PropertyUtils.setProperty(src, name, objPropertyValue);
+                    }
+                    continue;
+                }
+
+                //处理对象（集合）
+                if (srcPropertyValue == null || objPropertyValue == null) {
                     PropertyUtils.setProperty(src, name, objPropertyValue);
                     continue;
                 }
 
-                if (objPropertyValue == null)
-                    continue;
-
-                if (isMappingJavaType(type)) {
-                    if (setValueable.beforeSetProperty(src, name, srcPropertyValue, objPropertyValue)) {
-                        PropertyUtils.setProperty(src, name, objPropertyValue);
-                    }
-
-                } else if(isConverter(src.getClass(), name)) { //hibernate自定义属性@Converter
-
+                if (isConverter(src.getClass(), name)) { //hibernate自定义属性@Converter
                     merge(srcPropertyValue, objPropertyValue, deep, setValueable);
 
-                }  else if (deep) {
-
+                } else if (deep) { //对象 或 集合
                     if (Collection.class.isAssignableFrom(type)) { //Collection
                         Collection srcCollection = (Collection)srcPropertyValue;
                         Collection objCollection = (Collection)objPropertyValue;
@@ -136,15 +131,22 @@ public class EntityBeanUtils {
                             }
                         }
                     } else if (BaseEntity.class.isAssignableFrom(type) && isNotIgnoreObject(src.getClass(), name)){// Entity Object
-                        merge(srcPropertyValue, objPropertyValue, deep, setValueable);
+                        //modify at 20180720
+                        if (Objects.equals(((BaseEntity)srcPropertyValue).getId(), ((BaseEntity)objPropertyValue).getId())) { //合并实体对象
+                            merge(srcPropertyValue, objPropertyValue, deep, setValueable);
+                        } else { //如id发生变化，则不需要合并，直接返回新的obj
+                            PropertyUtils.setProperty(src, name, objPropertyValue);
+                        }
                     }
                 }
 
             } catch (NoSuchMethodException e) {
+                e.printStackTrace();
                 continue;
+
             } catch (Exception e) {
                 logger.error("exception", e);
-
+                e.printStackTrace();
             }
         }
     }
@@ -219,7 +221,7 @@ public class EntityBeanUtils {
         Field field;
         try {
             field = aClass.getDeclaredField(name);
-            return !(field.isAnnotationPresent(JsonIgnore.class) || field.isAnnotationPresent(Transient.class));
+            return !(/*field.isAnnotationPresent(JsonIgnore.class) || */field.isAnnotationPresent(Transient.class));
         } catch (NoSuchFieldException e) {
             return true;
         }

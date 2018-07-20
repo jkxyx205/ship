@@ -31,7 +31,7 @@ public class MeetingService extends BaseService<Meeting> {
 
     @Transactional
     public Meeting save(Meeting meeting) {
-        super.saveCascade(meeting);
+        super.multiEntitySave(meeting);
         userInboxService.tipAll(ItemType.MEETING, meeting.getId());
         return meeting;
     }

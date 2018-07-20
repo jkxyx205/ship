@@ -2,8 +2,10 @@ package com.yodean.platform.dict.controller;
 
 import com.yodean.common.dto.Result;
 import com.yodean.common.util.ResultUtils;
+import com.yodean.dictionary.dto.DictDTO;
 import com.yodean.dictionary.entity.Dict;
 import com.yodean.dictionary.service.DictService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +21,13 @@ public class DictController {
 
     /**
      * 添加字典
-     * @param dict
+     * @param dictDTO
      * @return
      */
     @PostMapping
-    public Result<Long> save(@RequestBody Dict dict) {
+    public Result<Long> save(@RequestBody DictDTO dictDTO) {
+        Dict dict = new Dict();
+        BeanUtils.copyProperties(dictDTO, dict);
         dictService.save(dict);
         return ResultUtils.success(dict.getId());
     }
