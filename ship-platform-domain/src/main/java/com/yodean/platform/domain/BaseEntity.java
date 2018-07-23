@@ -56,7 +56,6 @@ public class BaseEntity implements Serializable {
             this.setId(IDUtils.genItemId());
             this.setCreateBy(UserUtils.getCurrentEmployee().getUser().getId());
             this.setCreateDate(now);
-
         }
 
         if (Objects.isNull(this.getDelFlag()))

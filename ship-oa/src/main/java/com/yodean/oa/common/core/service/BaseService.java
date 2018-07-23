@@ -7,6 +7,7 @@ import com.yodean.platform.api.util.EntityBeanUtils;
 import com.yodean.platform.domain.BaseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.transaction.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ public abstract class BaseService<T extends BaseEntity> {
      * @param t
      * @return
      */
+    @Transactional
     public T save(T t) {
         JpaRepository<T,Long> jpaRepository = autowired();
 
@@ -66,6 +68,7 @@ public abstract class BaseService<T extends BaseEntity> {
      * @param id
      * @return
      */
+    @Transactional
     public void delete(Long id) {
         JpaRepository<T, Long> jpaRepository = autowired();
         jpaRepository.deleteById(id);
@@ -76,6 +79,7 @@ public abstract class BaseService<T extends BaseEntity> {
      * @param id
      * @return
      */
+    @Transactional
     public void deleteByFlag(Long id) {
         JpaRepository<T,Long> jpaRepository = autowired();
         Optional<T> optional = jpaRepository.findById(id);

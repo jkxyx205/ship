@@ -27,6 +27,8 @@ public class EntityBeanUtils {
 
     private static final transient Logger logger = LoggerFactory.getLogger(EntityBeanUtils.class);
 
+    private static final ThreadLocal<Set<Object>> mergeObject = new ThreadLocal<>();
+
     /**
      * 对象是POJO，不能是集合对象
      * 合并对象属性，将obj的非null值合并到src，
@@ -36,6 +38,17 @@ public class EntityBeanUtils {
      * @param obj
      */
     public static void  merge(Object src, Object obj) {
+
+        if (mergeObject.get() == null) {
+            mergeObject.set(new HashSet<>());
+        }
+
+        if (!(mergeObject.get().contains(src))) { //防止循环引用
+            mergeObject.get().add(src);
+        } else {
+            return;
+        }
+
         PropertyUtilsBean propertyUtilsBean = BeanUtilsBean.getInstance().getPropertyUtils();
         PropertyDescriptor[] propertyDescriptorsOfSrc = propertyUtilsBean.getPropertyDescriptors(src.getClass());
 

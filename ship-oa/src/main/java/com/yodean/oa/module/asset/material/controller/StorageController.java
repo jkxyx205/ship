@@ -1,4 +1,4 @@
-package com.yodean.oa.module.asset.material;
+package com.yodean.oa.module.asset.material.controller;
 
 import com.yodean.common.dto.Result;
 import com.yodean.common.util.ResultUtils;
