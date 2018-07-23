@@ -153,7 +153,7 @@ public class CompanyServiceImpl implements CompanyService {
     public Employee save(Employee employee) {
         if (Objects.nonNull(employee.getId())) { //编辑
             Employee persist = employeeRepository.getOne(employee.getId());
-            EntityBeanUtils.merge(persist, employee, false );
+            EntityBeanUtils.merge(persist, employee);
             employee = persist;
 
             //如果是未激活的用户，可以修改手机号码

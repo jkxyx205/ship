@@ -30,7 +30,7 @@ public class StorageController extends BaseController<Storage>{
     @Override
     public Result update(@RequestBody Storage storage, @PathVariable Long id) {
         storage.setId(id);
-        autowired().multiEntitySave(storage);
+        autowired().save(storage);
         return ResultUtils.success();
     }
 }

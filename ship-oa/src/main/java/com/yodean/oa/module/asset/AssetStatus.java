@@ -7,7 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public enum AssetStatus {
-    NORMAL("归还"), FORBIDDEN("禁用"), BORROWING("领用");
+    NORMAL("可用"), FORBIDDEN("禁用"), BORROWING("领用");
 
     private String description;
     AssetStatus(String description) {

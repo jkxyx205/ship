@@ -30,37 +30,12 @@ public class EntityBeanUtils {
     /**
      * 对象是POJO，不能是集合对象
      * 合并对象属性，将obj的非null值合并到src，
-     * 合并基本数据类型+ String + 枚举 + Date
+     * 合并:基本数据类型+ String + 枚举 + Date
      *
      * @param src
      * @param obj
      */
-    public static void merge(Object src, Object obj) {
-        merge(src, obj, true);
-    }
-
-    public static void merge(Object src, Object obj, boolean deep) {
-
-        logger.info("Begin merge entity:{}", src.getClass());
-
-        merge(src, obj, deep, (src1, propertyName, srcValue, objValue) -> {
-            if (Objects.nonNull(objValue) && isNotEqual(srcValue, objValue)) {
-                //if Date
-
-                logger.info("Modify entity [{}] property [{}] from [{}] to [{}]", src1.getClass(), propertyName, srcValue, objValue);
-                return true;
-            }
-            return  false;
-        });
-
-        logger.info("End merge entity:{}", src.getClass());
-    }
-
-    private static void merge(Object src, Object obj, boolean deep, SetValueAble setValueable) {
-        if (Objects.isNull(src) || Objects.isNull(obj)) {
-            return;
-        }
-
+    public static void  merge(Object src, Object obj) {
         PropertyUtilsBean propertyUtilsBean = BeanUtilsBean.getInstance().getPropertyUtils();
         PropertyDescriptor[] propertyDescriptorsOfSrc = propertyUtilsBean.getPropertyDescriptors(src.getClass());
 
@@ -73,28 +48,35 @@ public class EntityBeanUtils {
 
             Class<?> type = propertyDescriptor.getPropertyType();
 
+            if (isIgnoreProperty(src.getClass(), name)) { //忽略字段
+                continue;
+            }
+
             try {
                 Object srcPropertyValue = propertyUtilsBean.getProperty(src, name);
                 Object objPropertyValue = propertyUtilsBean.getProperty(obj, name);
 
-                if (isMappingJavaType(type)) { //"基本"数量类型
-                    if (setValueable.beforeSetProperty(src, name, srcPropertyValue, objPropertyValue)) {
+                // 普通属性
+                if (isMappingJavaType(type)) { //"基本"属性类型
+                    if( Objects.nonNull(objPropertyValue))
                         PropertyUtils.setProperty(src, name, objPropertyValue);
-                    }
+
                     continue;
+
                 }
 
-                //处理对象（集合）
+                // 处理对象（集合）
                 if (srcPropertyValue == null || objPropertyValue == null) {
                     PropertyUtils.setProperty(src, name, objPropertyValue);
                     continue;
                 }
 
-                if (isConverter(src.getClass(), name)) { //hibernate自定义属性@Converter
-                    merge(srcPropertyValue, objPropertyValue, deep, setValueable);
+                if (isConverter(src.getClass(), name)) { //hibernate自定义对象
 
-                } else if (deep) { //对象 或 集合
-                    if (Collection.class.isAssignableFrom(type)) { //Collection
+                    merge(srcPropertyValue, objPropertyValue);
+
+                } else {
+                    if (Collection.class.isAssignableFrom(type)) { //集合对象
                         Collection srcCollection = (Collection)srcPropertyValue;
                         Collection objCollection = (Collection)objPropertyValue;
 
@@ -113,7 +95,7 @@ public class EntityBeanUtils {
                                 if (Objects.isNull(id))
                                     id = (long)objSub.hashCode();
 
-                                merge(srcMapping.get(id), objSub, deep, setValueable);
+                                merge(srcMapping.get(id), objSub);
 
                             }  else {//不存在直接添加
                                 srcCollection.add(objSub);
@@ -123,6 +105,7 @@ public class EntityBeanUtils {
                         }
 
                         Iterator<Object> iterator = srcCollection.iterator();
+
                         while (iterator.hasNext()) {
                             Object objSrc = iterator.next();
                             if (!objCollection.contains(objSrc)) {
@@ -130,37 +113,26 @@ public class EntityBeanUtils {
                                 logger.info("Remove entity [{}] property [{}] with [{}]", src.getClass(), name, objSrc);
                             }
                         }
-                    } else if (BaseEntity.class.isAssignableFrom(type) && isNotIgnoreObject(src.getClass(), name)){// Entity Object
+                    } else if (BaseEntity.class.isAssignableFrom(type)){// Entity Object
                         //modify at 20180720
                         if (Objects.equals(((BaseEntity)srcPropertyValue).getId(), ((BaseEntity)objPropertyValue).getId())) { //合并实体对象
-                            merge(srcPropertyValue, objPropertyValue, deep, setValueable);
+                            merge(srcPropertyValue, objPropertyValue);
                         } else { //如id发生变化，则不需要合并，直接返回新的obj
                             PropertyUtils.setProperty(src, name, objPropertyValue);
                         }
                     }
                 }
-
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-                continue;
-
             } catch (Exception e) {
-                logger.error("exception", e);
                 e.printStackTrace();
             }
         }
     }
-
     private static boolean isMappingJavaType(Class<?> type) {
         return type == Boolean.class || type == Character.class || type == Byte.class || type == Short.class
                 || type == Integer.class || type == Long.class || type == Float.class || type == Double.class
                 || type == Date.class || type == String.class || type == BigInteger.class || type == BigDecimal.class
                 || type == Byte[].class || type == Blob.class || type == Clob.class || type == Timestamp.class
                 || type.isEnum();
-    }
-
-    private interface SetValueAble {
-        boolean beforeSetProperty(Object src, String propertyName, Object srcValue, Object objValue);
     }
 
 
@@ -175,22 +147,6 @@ public class EntityBeanUtils {
         }
 
         return set;
-    }
-
-    private static boolean isNotEqual(Object obj1, Object obj2) {
-        if (Objects.equals(obj1, obj2)) {
-            return false;
-        }
-
-        if (obj1 instanceof Date && obj2 instanceof Date) {
-            Date date1 = (Date)obj1;
-            Date date2 = (Date)obj2;
-
-            return date1.getTime() != date2.getTime();
-        }
-
-        return true;
-
     }
 
     private static String unCapitalize(Object target) {
@@ -217,15 +173,14 @@ public class EntityBeanUtils {
 
     }
 
-    private static boolean isNotIgnoreObject(Class<?> aClass, String name) {
+    private static boolean isIgnoreProperty(Class<?> aClass, String name) {
         Field field;
         try {
             field = aClass.getDeclaredField(name);
-            return !(/*field.isAnnotationPresent(JsonIgnore.class) || */field.isAnnotationPresent(Transient.class));
+            return field.isAnnotationPresent(Transient.class);
         } catch (NoSuchFieldException e) {
             return true;
         }
-
     }
 
     public static boolean isSetter(Method method){

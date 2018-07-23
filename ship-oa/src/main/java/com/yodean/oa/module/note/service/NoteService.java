@@ -31,6 +31,6 @@ public class NoteService extends BaseService<Note> {
         userInbox.setAuthorityId(UserUtils.getCurrentEmployee().getId());
         note.getUserList().add(userInbox);
 
-        return super.multiEntitySave(note);
+        return super.save(note);
     }
 }

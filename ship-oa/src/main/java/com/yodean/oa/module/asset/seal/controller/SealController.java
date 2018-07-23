@@ -34,7 +34,7 @@ public class SealController extends BaseController<Seal> {
     @PutMapping("/{id}")
     public Result update(@RequestBody Seal seal, @PathVariable Long id) {
         seal.setId(id);
-        autowired().multiEntitySave(seal);
+        autowired().save(seal);
         return ResultUtils.success();
     }
 

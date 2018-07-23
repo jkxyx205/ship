@@ -15,13 +15,13 @@ public abstract class BaseController<T extends BaseEntity> {
 
     @PostMapping
     public Result<Long> save(@RequestBody T t) {
-        return ResultUtils.success(autowired().singleEntitySave(t).getId());
+        return ResultUtils.success(autowired().save(t).getId());
     }
 
     @PutMapping("/{id}")
     public Result update(@RequestBody T t, @PathVariable Long id) {
         t.setId(id);
-        autowired().singleEntitySave(t);
+        autowired().save(t);
         return ResultUtils.success();
     }
 

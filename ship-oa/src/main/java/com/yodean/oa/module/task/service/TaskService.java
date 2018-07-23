@@ -53,7 +53,7 @@ public class TaskService extends BaseService<Task> {
         taskLog.setTask(task);
         taskLog.setContent(log);
 
-        task = super.multiEntitySave(task);
+        task = super.save(task);
 
         taskLogRepository.save(taskLog);
         return task;

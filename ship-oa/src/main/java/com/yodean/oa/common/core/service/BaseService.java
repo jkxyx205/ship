@@ -17,21 +17,12 @@ public abstract class BaseService<T extends BaseEntity> {
 
     abstract protected JpaRepository<T, Long> autowired();
 
-    public T singleEntitySave(T t) {
-        return saveEntity(t, false);
-    }
-
     /**
-     * 有映射关系的实体，如@ManyToMany @OneToMany
-     * 需要级联合并属性
+     * 增量保存，忽略null的字段
      * @param t
      * @return
      */
-    public T multiEntitySave(T t) {
-        return saveEntity(t, true);
-    }
-
-    private T saveEntity(T t, boolean deep) {
+    public T save(T t) {
         JpaRepository<T,Long> jpaRepository = autowired();
 
         //参数格式化
@@ -40,7 +31,7 @@ public abstract class BaseService<T extends BaseEntity> {
         if (Objects.nonNull(t.getId())) { //修改
             T persist = findById(t.getId());
 
-            EntityBeanUtils.merge(persist, t, deep);
+            EntityBeanUtils.merge(persist, t);
             t = persist;
         }
 

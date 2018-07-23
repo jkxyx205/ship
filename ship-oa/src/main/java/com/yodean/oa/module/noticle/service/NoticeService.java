@@ -32,7 +32,7 @@ public class NoticeService extends BaseService<Notice> {
             notice.setCover(cover);
         }
 
-        notice = super.multiEntitySave(notice);
+        notice = super.save(notice);
         return notice;
     }
 
