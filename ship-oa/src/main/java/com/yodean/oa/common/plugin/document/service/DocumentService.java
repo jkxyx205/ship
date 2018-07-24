@@ -5,6 +5,7 @@ import com.yodean.common.enums.DelFlag;
 import com.yodean.common.util.MimeTypesUtils;
 import com.yodean.common.util.ZipUtils;
 import com.yodean.oa.common.Global;
+import com.yodean.oa.common.core.service.BaseService;
 import com.yodean.oa.common.exception.OAException;
 import com.yodean.oa.common.plugin.document.dao.DocumentRepository;
 import com.yodean.oa.common.plugin.document.dto.ImageDocument;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
@@ -39,7 +41,7 @@ import java.util.zip.ZipOutputStream;
  * Created by rick on 2018/3/22.
  */
 @Service
-public class DocumentService {
+public class DocumentService extends BaseService<Document> {
 
     @Resource
     private DocumentRepository documentRepository;
@@ -49,9 +51,6 @@ public class DocumentService {
 
     @Resource
     private ImageHandler imageHandler;
-
-    @Resource
-    private JdbcTemplate jdbcTemplate;
 
     private static final String READ_ATTACHMENT = "attachment";
 
@@ -130,32 +129,8 @@ public class DocumentService {
 
     }
 
-    public Document save(Document document) {
-        return documentRepository.save(document);
-    }
 
-    public List<Document> save(Iterable<Document> iterator) {
-        return documentRepository.saveAll(iterator);
-    }
 
-    public Document findById(Long id) {
-        Optional<Document> optional = documentRepository.findById(id);
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-
-        throw new RuntimeException("文件不存在");
-    }
-
-    /***
-     * 逻辑删除文件
-     * @param id
-     */
-    public void delete(Long id) {
-        Document document = findById(id);
-        document.setDelFlag(DelFlag.DEL_FLAG_REMOVE);
-        save(document);
-    }
 
     /***
      * 逻辑彻底删除文件
@@ -165,31 +140,6 @@ public class DocumentService {
         Document document = findById(id);
         document.setDelFlag(DelFlag.DEL_FLAG_CLEAN);
         save(document);
-    }
-
-
-
-    /***
-     * 绑定附件到实例上
-     * @param docIds
-     * @param categoryId
-     */
-    public void update(Set<Long> docIds, DocumentCategory category, Long categoryId) {
-        Validate.notNull(categoryId);
-        Validate.notNull(docIds);
-
-        if (docIds.size() == 0) {
-            return;
-        }
-
-        String sql = "UPDATE oa_document set category = ?, category_id = ? WHERE id = ?";
-
-        List<Object[]> params = new ArrayList<>(docIds.size());
-        for (Long docId : docIds) {
-            params.add(new Object[]{category.name(), categoryId, docId});
-        }
-
-        jdbcTemplate.batchUpdate(sql, params);
     }
 
     /**
@@ -277,13 +227,16 @@ public class DocumentService {
      * @param fileFullName
      * @return
      */
-    public boolean isUniqueFileNameWithExists(Long docId, FileType fileType, String fileFullName) {
-        Long parentId = findById(docId).getParentId();
+    public boolean isUniqueFileNameWithExists(Long docId, String fileFullName) {
+
+        Document document = findById(docId);
+
+        Long parentId = document.getParentId();
 
         List<Document> siblingsList = findSubDocument(parentId);
 
-        for(Document document : siblingsList) {
-            if(document.getFileType() == fileType && docId != document.getId() && document.getFullName().equals(fileFullName)) {
+        for(Document subDocument : siblingsList) {
+            if(subDocument.getFileType() == document.getFileType() && docId != subDocument.getId() && subDocument.getFullName().equals(fileFullName)) {
                 return false;
             }
         }
@@ -484,9 +437,9 @@ public class DocumentService {
      * @param fileFullName
      * @param parentId
      * @param documentCategory
-     * @param id
+     * @param categoryId
      */
-    public Long mkdir(String fileFullName, Long parentId, DocumentCategory documentCategory, Long id) {
+    public Long mkdir(String fileFullName, Long parentId, DocumentCategory documentCategory, Long categoryId) {
         //检查文件名是否重复
         if (!isUniqueFileNameWithNew(parentId, FileType.FOLDER, fileFullName)) {
             throw new OAException(ExceptionCode.FILE_NAME_DUPLICATE_ERROR);
@@ -494,23 +447,33 @@ public class DocumentService {
 
         Document document = new Document();
         document.setCategory(documentCategory);
-        document.setCategoryId(id);
+        document.setCategoryId(categoryId);
         document.setFileType(FileType.FOLDER);
         document.setFullName(fileFullName);
         document.setParentId(parentId);
         document.setInherit(true);// 初始化启用继承
-        save(document);
-        return document.getId();
+
+        return save(document).getId();
     }
 
-    public void rename(Long id, String name) {
-        Document document = findById(id);
+    /**
+     * 文件重命名
+     * @param docId
+     * @param name
+     */
+    public void rename(Long docId, String name) {
+        Document document = findById(docId);
         //检查文件名是否重复
-        if (!isUniqueFileNameWithExists(id, document.getFileType(), name)) {
+        if (!isUniqueFileNameWithExists(docId, name)) {
             throw new OAException(ExceptionCode.FILE_NAME_DUPLICATE_ERROR);
         }
 
         document.setFullName(name);
         save(document);
+    }
+
+    @Override
+    protected JpaRepository<Document, Long> autowired() {
+        return documentRepository;
     }
 }

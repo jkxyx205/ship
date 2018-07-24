@@ -63,7 +63,7 @@ public class Material extends BaseEntity {
      * H. 耗材
      */
     @Getter
-    private enum  MaterialType {
+    public static enum  MaterialType {
         S("设备"), H("耗材");
         private String description;
 

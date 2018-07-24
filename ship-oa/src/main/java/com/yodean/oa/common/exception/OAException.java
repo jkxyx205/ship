@@ -29,7 +29,7 @@ public class OAException extends RuntimeException {
 
 
     public OAException(ExceptionCode exceptionCode, Exception exception) {
-        this(exceptionCode, null, exception);
+        this(exceptionCode, exceptionCode.getMessage(), exception);
     }
 
     public OAException(ExceptionCode exceptionCode, String message, Exception exception) {

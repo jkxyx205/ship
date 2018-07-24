@@ -90,6 +90,9 @@ public class BaseEntity implements Serializable {
 
     @Override
     public int hashCode() {
+        if (Objects.isNull(id))
+            return super.hashCode();
+
         return id.hashCode();
     }
 }

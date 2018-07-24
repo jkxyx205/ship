@@ -1,5 +1,6 @@
 package com.yodean.oa.common.core.service;
 
+import com.google.common.collect.Lists;
 import com.yodean.common.enums.DelFlag;
 import com.yodean.oa.common.exception.OAException;
 import com.yodean.oa.common.plugin.document.enums.ExceptionCode;
@@ -8,6 +9,8 @@ import com.yodean.platform.domain.BaseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.transaction.Transactional;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,7 +29,22 @@ public abstract class BaseService<T extends BaseEntity> {
     @Transactional
     public T save(T t) {
         JpaRepository<T,Long> jpaRepository = autowired();
+        return jpaRepository.save(merge(t));
+    }
 
+    @Transactional
+    public List<T> saveAll(Collection<T> list) {
+
+        JpaRepository<T,Long> jpaRepository = autowired();
+
+        List<T> saveList = Lists.newArrayListWithExpectedSize(list.size());
+
+        list.forEach(t -> saveList.add(merge(t)));
+
+        return jpaRepository.saveAll(saveList);
+    }
+
+    private T merge(T t) {
         //参数格式化
         t.initParams();
 
@@ -37,7 +55,7 @@ public abstract class BaseService<T extends BaseEntity> {
             t = persist;
         }
 
-        return jpaRepository.save(t);
+        return t;
     }
 
     /**
