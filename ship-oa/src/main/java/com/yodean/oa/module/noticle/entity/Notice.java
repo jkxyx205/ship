@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yodean.oa.common.core.entity.ContentEntity;
 import com.yodean.oa.common.plugin.document.entity.Document;
-import com.yodean.oa.common.plugin.document.enums.DocumentCategory;
 import com.yodean.oa.module.inbox.ItemType;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,10 +22,6 @@ public class Notice extends ContentEntity {
     @Transient
     @JsonIgnore
     protected ItemType itemType = ItemType.NOTICE;
-
-    @Transient
-    @JsonIgnore
-    protected DocumentCategory documentCategory = DocumentCategory.NOTICE;
 
     /**
      * 置顶

@@ -2,7 +2,6 @@ package com.yodean.oa.module.meeting.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yodean.oa.common.core.entity.ContentEntity;
-import com.yodean.oa.common.plugin.document.enums.DocumentCategory;
 import com.yodean.oa.module.inbox.ItemType;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,8 +43,4 @@ public class Meeting extends ContentEntity {
     @Transient
     @JsonIgnore
     protected ItemType itemType = ItemType.MEETING;
-
-    @Transient
-    @JsonIgnore
-    protected DocumentCategory documentCategory = DocumentCategory.MEETING;
 }

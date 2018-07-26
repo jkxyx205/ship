@@ -15,6 +15,7 @@ public final class MimeTypesUtils {
         String contentType = "application/octet-stream";
         if (returnFileName.lastIndexOf(".") < 0)
             return contentType;
+
         returnFileName = returnFileName.toLowerCase();
         returnFileName = returnFileName.substring(returnFileName.lastIndexOf(".") + 1);
         if (returnFileName.equals("html") || returnFileName.equals("htm") || returnFileName.equals("shtml")) {

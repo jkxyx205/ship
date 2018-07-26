@@ -60,6 +60,7 @@ public abstract class BaseService<T extends BaseEntity> {
 
     /**
      * 根据id查找详情
+     * 没有则抛出异常
      * @param id
      * @return
      */
@@ -79,6 +80,17 @@ public abstract class BaseService<T extends BaseEntity> {
 
         t.initResponse();
         return t;
+    }
+
+    /**
+     * 根据id查找详情
+     * 没有返回null
+     * @param id
+     * @return
+     */
+    public T getOne(Long id) {
+        JpaRepository<T,Long> jpaRepository = autowired();
+        return jpaRepository.getOne(id);
     }
 
     /**

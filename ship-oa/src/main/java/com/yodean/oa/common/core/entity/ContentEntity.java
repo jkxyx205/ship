@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yodean.common.util.JacksonUtils;
 import com.yodean.oa.common.plugin.document.entity.Document;
-import com.yodean.oa.common.plugin.document.enums.DocumentCategory;
 import com.yodean.oa.module.inbox.ItemStatus;
 import com.yodean.oa.module.inbox.ItemType;
 import com.yodean.oa.module.inbox.Priority;
@@ -74,7 +73,6 @@ public class ContentEntity extends BaseEntity {
      */
     @OneToMany
     @JoinColumn(name = "category_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
-//    @Where(clause = "category = 'NOTE'")
     private List<Document> documents = new ArrayList<>();
 
     @Transient
@@ -86,14 +84,10 @@ public class ContentEntity extends BaseEntity {
      */
     @JoinColumn(name = "item_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Where(clause = "item_type = 'NOTE'")
     private List<UserInbox> userList = new ArrayList<>();
 
     @Transient
     protected ItemType itemType;
-
-    @Transient
-    protected DocumentCategory documentCategory;
 
 
     @Override
@@ -119,7 +113,6 @@ public class ContentEntity extends BaseEntity {
                 Document document = new Document();
                 document.setId(docId);
                 document.setCategoryId(this.getId());
-                document.setCategory(this.getDocumentCategory());
                 getDocuments().add(document);
             }
         }

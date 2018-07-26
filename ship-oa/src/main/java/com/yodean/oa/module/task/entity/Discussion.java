@@ -2,7 +2,6 @@ package com.yodean.oa.module.task.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yodean.oa.common.plugin.document.entity.Document;
-import com.yodean.oa.common.plugin.document.enums.DocumentCategory;
 import com.yodean.platform.domain.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,7 +46,6 @@ public class Discussion extends BaseEntity {
                 Document document = new Document();
                 document.setId(docId);
                 document.setCategoryId(this.getId());
-                document.setCategory(DocumentCategory.TASK_DISCUSSION);
                 getDocuments().add(document);
             }
         }

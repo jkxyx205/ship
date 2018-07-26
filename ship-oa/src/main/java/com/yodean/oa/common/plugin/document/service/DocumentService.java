@@ -10,16 +10,15 @@ import com.yodean.oa.common.exception.OAException;
 import com.yodean.oa.common.plugin.document.dao.DocumentRepository;
 import com.yodean.oa.common.plugin.document.dto.ImageDocument;
 import com.yodean.oa.common.plugin.document.entity.Document;
-import com.yodean.oa.common.plugin.document.enums.DocumentCategory;
 import com.yodean.oa.common.plugin.document.enums.ExceptionCode;
 import com.yodean.oa.common.plugin.document.enums.FileType;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
@@ -61,28 +60,25 @@ public class DocumentService extends BaseService<Document> {
      * @param file 文件
      * @param folder 文件存储路径
      * @param parentId 所属文件夹
-     * @param category 分类
      * @param id 分类id
      * @return
      * @throws IOException
      */
     @Transactional
-    public Document upload(MultipartFile file, String folder, Long parentId, DocumentCategory category, Long id) throws IOException {
+    public Document upload(MultipartFile file, String folder, Long parentId, Long id) throws IOException {
         //上传到服务器
         Document document = documentHandler.store(folder, file);
-        document.setCategory(category);
         document.setCategoryId(id);
         document.setParentId(parentId);
-        document.setInherit(true);
         document.setFullName(getUniqueName(parentId, FileType.FILE, document.getFullName())); //如果重名自动编号
         return save(document);
     }
 
     @Transactional
-    public List<Document> upload(List<MultipartFile> files, String folder, Long parentId, DocumentCategory category, Long id) throws IOException {
+    public List<Document> upload(List<MultipartFile> files, String folder, Long parentId, Long id) throws IOException {
         List<Document> documents = new ArrayList<>(files.size());
         for(MultipartFile file : files) {
-            documents.add(upload(file, folder, parentId, category, id));
+            documents.add(upload(file, folder, parentId, id));
         }
         return documents;
     }
@@ -130,8 +126,6 @@ public class DocumentService extends BaseService<Document> {
     }
 
 
-
-
     /***
      * 逻辑彻底删除文件
      * @param id
@@ -143,23 +137,63 @@ public class DocumentService extends BaseService<Document> {
     }
 
     /**
-     * 查找实例的所有文件
-     * @param category
-     * @param categoryId
-     * @return
+     * 还原文件
+     * @param id
      */
-    public List<Document> findById(DocumentCategory category, Long categoryId) {
-        Document document = new Document();
-        document.setCategory(category);
-        document.setCategoryId(categoryId);
-        document.setDelFlag(DelFlag.DEL_FLAG_NORMAL);
+    public void putBack(Long id) {
+        //目录路径
+        List<Document> path = findDocumentPath(id);
 
-        Example example = Example.of(document);
-        return documentRepository.findAll(example);
+        Long parentFlag = path.get(0).getParentId(); //当前目录的父目录ID
+
+        for (Document curDoc : path) {
+
+            curDoc.setParentId(parentFlag);
+
+            if (DelFlag.DEL_FLAG_REMOVE == curDoc.getDelFlag()) {//文件已经删除
+                if (isUniqueFileNameWithNew(parentFlag, curDoc.getFileType(), curDoc.getFullName())) { //没有同名文件
+                    if(id == curDoc.getId()) {//要恢复的目录
+                        curDoc.setDelFlag(DelFlag.DEL_FLAG_NORMAL);
+                        parentFlag = curDoc.getId();
+                    } else {// 上层目录
+                        parentFlag = mkdir(curDoc.getFullName(), parentFlag, null).getId();
+                    }
+
+                } else { //有同名文件:获取同名的文件
+                    parentFlag = findByNameFromParent(parentFlag, curDoc.getFileType(), curDoc.getFullName()).getId();
+
+                    if(id == curDoc.getId()) {//要恢复的文件
+
+                        if (curDoc.getFileType() == FileType.FOLDER) { //恢复文件夹
+
+                            curDoc.setDelFlag(DelFlag.DEL_FLAG_CLEAN); //永久删除
+                            List<Document> subList = findSubDocument(id);
+
+                            for (Document document : subList) {
+                                document.setParentId(parentFlag);
+                            }
+
+                            path.addAll(subList); //合并所有修改
+                            break;
+                        } else { //恢复文件
+                            curDoc.setDelFlag(DelFlag.DEL_FLAG_NORMAL);
+                            curDoc.setFullName(getUniqueName(curDoc.getParentId(), FileType.FILE, curDoc.getFullName()));
+                        }
+                    }
+
+                }
+
+            } else {
+                parentFlag = curDoc.getId();
+            }
+        }
+
+        saveAll(path);
     }
 
+
     /**
-     * 查看所有父目录
+     * 查看父目录list
      * @param id
      * @return
      */
@@ -176,11 +210,7 @@ public class DocumentService extends BaseService<Document> {
         return findDocumentPath(id, true);
     }
 
-    /**
-     * 查看文件路径
-     * @param id
-     * @return
-     */
+
     private List<Document> findDocumentPath(Long id, boolean includeSelf) {
         Document document =  findById(id);
 
@@ -400,7 +430,7 @@ public class DocumentService extends BaseService<Document> {
         Document document = findById(id);
         OutputStream os = getResponseOutputStream(response, request, document.getFullName(), READ_INLINE);
         if (document.getFileType() == FileType.FOLDER) {
-            throw new OAException(ExceptionCode.FILE_DOWNLOAD_ERROR);
+            throw new OAException(ExceptionCode.FILE_PREVIEW_ERROR);
         } else {
             FileCopyUtils.copy(new FileInputStream(document.getFileAbsolutePath()), os);
         }
@@ -436,24 +466,26 @@ public class DocumentService extends BaseService<Document> {
      * 新建文件夹
      * @param fileFullName
      * @param parentId
-     * @param documentCategory
      * @param categoryId
      */
-    public Long mkdir(String fileFullName, Long parentId, DocumentCategory documentCategory, Long categoryId) {
+    public Document mkdir(String fileFullName, Long parentId,Long categoryId) {
+        //检查文件名是为空
+        if (org.apache.commons.lang3.StringUtils.isBlank(fileFullName)) {
+            throw new OAException(ExceptionCode.FILE_NAME_EMPTY_ERROR);
+        }
+
         //检查文件名是否重复
         if (!isUniqueFileNameWithNew(parentId, FileType.FOLDER, fileFullName)) {
             throw new OAException(ExceptionCode.FILE_NAME_DUPLICATE_ERROR);
         }
 
         Document document = new Document();
-        document.setCategory(documentCategory);
         document.setCategoryId(categoryId);
         document.setFileType(FileType.FOLDER);
         document.setFullName(fileFullName);
         document.setParentId(parentId);
-        document.setInherit(true);// 初始化启用继承
 
-        return save(document).getId();
+        return save(document);
     }
 
     /**
@@ -472,8 +504,97 @@ public class DocumentService extends BaseService<Document> {
         save(document);
     }
 
+    /**
+     * 文件移动
+     * @param id
+     * @param parentId
+     */
+    public void move(Long id, Long parentId) {
+        //check
+        if (!(moveCopyCheck(id, parentId))) {
+            throw new OAException(ExceptionCode.FILE_MOVE_ERROR);
+        }
+
+        Document document = findById(id);
+        document.setParentId(parentId);
+        save(document);
+    }
+
+    /**
+     * 文件拷贝
+     * @param id
+     * @param parentId
+     */
+    public void copy(Long id, Long parentId) {
+        //check
+        if (!(moveCopyCheck(id, parentId))) {
+            throw new OAException(ExceptionCode.FILE_COPY_ERROR);
+        }
+
+        Document document = findById(id);
+        recursionDoc(document, parentId);
+    }
+
+    /**
+     * 拷贝移动检查路径
+     * @param id
+     * @param parentId
+     * @return
+     */
+    private boolean moveCopyCheck(Long id, Long parentId) {
+        if (Objects.equals(id, parentId)) {
+            return false;
+        }
+
+        List<Document> parents = findDocumentPath(parentId);
+
+        for(Document document : parents) {
+            if (Objects.equals(id, document.getId())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private long recursionDoc(Document document, Long parentId) {
+        Document _document = SerializationUtils.clone(document);
+        _document.setId(null);
+        _document.setParentId(parentId);
+
+        save(_document);
+
+        if (document.getFileType() == FileType.FILE)
+            return _document.getId();
+
+        findSubDocument(document.getId()).forEach(subDocument -> {
+            recursionDoc(subDocument, _document.getId());
+        });
+
+        return _document.getId();
+    }
+
+
     @Override
     protected JpaRepository<Document, Long> autowired() {
         return documentRepository;
     }
+
+    @Override
+    public Document findById(Long id) {
+
+        Optional<Document> optional = documentRepository.findById(id);
+        if (!optional.isPresent()) {
+            throw new OAException(ExceptionCode.NOT_FOUND_ERROR);
+        }
+
+        Document t = optional.get();
+
+//        if (DelFlag.DEL_FLAG_CLEAN == t.getDelFlag()) {
+//            throw new OAException(ExceptionCode.NOT_FOUND_ERROR);
+//        }
+
+        return t;
+    }
+
 }

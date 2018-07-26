@@ -29,7 +29,7 @@ public final class Global implements ApplicationContextAware {
         this.CDN = cdn;
     }
 
-    public static void setTmp(String tmp) {
+    public void setTmp(String tmp) {
         Global.TMP = tmp;
     }
 

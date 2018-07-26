@@ -22,9 +22,14 @@ public enum ExceptionCode {
     EXISTS_ERROR(60000, "纪录已经存在"),
     NULL_ERROR(40001, "不合法的参数ID"),
     FILE_NAME_DUPLICATE_ERROR(40003, "文件名不能重复"),
+    FILE_NAME_EMPTY_ERROR(40004, "文件名不能空"),
     FILE_VIEW_ERROR(40005, "文件预览失败"),
     FILE_DOWNLOAD_ERROR(40006, "文件下载失败"),
+    FILE_PREVIEW_ERROR(40008, "文件架不支持在线预览"),
     FILE_UPLOAD_ERROR(40004, "文件上传失败"),
+    FILE_COPY_ERROR(40004, "不能将文件复制到自身或其子目录下"),
+    FILE_MOVE_ERROR(40004, "不能将文件移动到自身或其子目录下"),
+
     UNIT_FORMAT_EXCEPTION(40007, "单位无法转换"),
     NUM_NOT_ENOUGH(80007, "没有足够的数量");
 
