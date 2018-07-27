@@ -104,6 +104,11 @@ public abstract class BaseService<T extends BaseEntity> {
         jpaRepository.deleteById(id);
     }
 
+    public void deleteAll(Collection<T> list) {
+        JpaRepository<T, Long> jpaRepository = autowired();
+        jpaRepository.deleteInBatch(list);
+    }
+
     /**
      * 根据id逻辑删除
      * @param id
@@ -119,5 +124,6 @@ public abstract class BaseService<T extends BaseEntity> {
             jpaRepository.save(t);
         }
     }
+
 
 }

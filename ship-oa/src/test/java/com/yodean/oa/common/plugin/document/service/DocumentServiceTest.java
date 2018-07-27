@@ -21,7 +21,7 @@ public class DocumentServiceTest {
 
     @Test
     public void findDocumentPath() throws Exception {
-        List<Document> path = documentService.findDocumentPath(153250938699373L);
+        List<Document> path = documentService.findParentsDocuments2(153250938699373L);
         path.forEach(document -> {
             System.out.println(document.getName());
         });

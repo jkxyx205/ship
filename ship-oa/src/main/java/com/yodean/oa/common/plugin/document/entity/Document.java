@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Created by rick on 2018/3/22.
@@ -19,7 +20,7 @@ import java.io.File;
 @Setter
 @Entity
 @Table(name = "oa_document",
-        uniqueConstraints = {@UniqueConstraint(columnNames={"category_id", "type", "del_flag", "name", "ext"})})
+        uniqueConstraints = {@UniqueConstraint(columnNames={"category_id", "type", "del_flag","parent_id", "name", "ext"})})
 @DynamicUpdate
 public class Document extends BaseEntity {
     /**
@@ -68,6 +69,11 @@ public class Document extends BaseEntity {
     @Column(name = "category_id")
     private Long categoryId;
 
+    /**
+     * 是否启用权限继承
+     */
+    private Boolean inherit;
+
 
     public void setFullName(String fullName) {
         String fileName = StringUtils.stripFilenameExtension(fullName);
@@ -105,5 +111,12 @@ public class Document extends BaseEntity {
     public String getUrlPath() {
         if (FileType.FOLDER == this.fileType) return null;
         return Global.CDN + "/" + path + (StringUtils.isEmpty(this.getExt()) ? "" : "." + this.getExt());
+    }
+
+    @Override
+    public void initParams() {
+        if (Objects.isNull(inherit)) {
+            inherit = true; //默认实用继承权限
+        }
     }
 }

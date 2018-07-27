@@ -1,6 +1,7 @@
 package com.yodean.oa.common.plugin.document.service;
 
 
+import com.google.common.collect.Lists;
 import com.yodean.common.enums.DelFlag;
 import com.yodean.common.util.MimeTypesUtils;
 import com.yodean.common.util.ZipUtils;
@@ -142,7 +143,7 @@ public class DocumentService extends BaseService<Document> {
      */
     public void putBack(Long id) {
         //目录路径
-        List<Document> path = findDocumentPath(id);
+        List<Document> path = findParentsDocuments(id);
 
         Long parentFlag = path.get(0).getParentId(); //当前目录的父目录ID
 
@@ -193,20 +194,20 @@ public class DocumentService extends BaseService<Document> {
 
 
     /**
-     * 查看父目录list
+     * 递归查找所有父目录
      * @param id
      * @return
      */
-    public List<Document> findParentsDocument(Long id) {
+    public List<Document> findParentsDocuments(Long id) {
         return findDocumentPath(id, false);
     }
 
     /**
-     * 查看文件路径
+     * 递归查找所有父目录(包含自身)
      * @param id
      * @return
      */
-    public List<Document> findDocumentPath(Long id) {
+    public List<Document> findParentsDocuments2(Long id) {
         return findDocumentPath(id, true);
     }
 
@@ -230,7 +231,6 @@ public class DocumentService extends BaseService<Document> {
             parentsDocument.add(document);
 
         return parentsDocument;
-
     }
 
     /**
@@ -322,15 +322,47 @@ public class DocumentService extends BaseService<Document> {
     }
 
     /**
-     * 查找所有子文件（夹）
+     * 查找紧邻的子文件（夹）
      * @return
      */
-    public List<Document> findSubDocument(Long parentId) {
+    public List<Document> findSubDocument(Long id) {
         Document document = new Document();
-        document.setParentId(parentId);
+        document.setParentId(id);
         document.setDelFlag(DelFlag.DEL_FLAG_NORMAL);
 
         Example example = Example.of(document);
+        return documentRepository.findAll(example);
+    }
+
+    /**
+     * 查找紧邻的子文件（夹）
+     * @return
+     */
+    public List<Document> findAllSubDocument(Long id) {
+        List<Document> documentList = Lists.newArrayList();
+
+        findAllSubDocument(documentList, id);
+        return documentList;
+    }
+
+    private void findAllSubDocument(List<Document> documentList, long id) {
+        List<Document> subList = findSubDocument(id);
+
+        for(Document subDoc : subList) {
+            documentList.add(subDoc);
+
+            if (FileType.FOLDER == subDoc.getFileType()) {
+                findAllSubDocument(subDoc.getId());
+            }
+        }
+
+    }
+
+    /**
+     * 查找所有
+     * @return
+     */
+    public List<Document> findDocumentByExample(Example example) {
         return documentRepository.findAll(example);
     }
 
@@ -468,7 +500,7 @@ public class DocumentService extends BaseService<Document> {
      * @param parentId
      * @param categoryId
      */
-    public Document mkdir(String fileFullName, Long parentId,Long categoryId) {
+    public Document mkdir(String fileFullName, Long parentId, Long categoryId) {
         //检查文件名是为空
         if (org.apache.commons.lang3.StringUtils.isBlank(fileFullName)) {
             throw new OAException(ExceptionCode.FILE_NAME_EMPTY_ERROR);
@@ -516,6 +548,7 @@ public class DocumentService extends BaseService<Document> {
         }
 
         Document document = findById(id);
+
         document.setParentId(parentId);
         save(document);
     }
@@ -525,14 +558,14 @@ public class DocumentService extends BaseService<Document> {
      * @param id
      * @param parentId
      */
-    public void copy(Long id, Long parentId) {
+    public long copy(Long id, Long parentId) {
         //check
         if (!(moveCopyCheck(id, parentId))) {
             throw new OAException(ExceptionCode.FILE_COPY_ERROR);
         }
 
         Document document = findById(id);
-        recursionDoc(document, parentId);
+        return recursionDoc(document, parentId);
     }
 
     /**
@@ -542,11 +575,15 @@ public class DocumentService extends BaseService<Document> {
      * @return
      */
     private boolean moveCopyCheck(Long id, Long parentId) {
-        if (Objects.equals(id, parentId)) {
+        if (Objects.equals(id, parentId)) { //自身目录
             return false;
         }
 
-        List<Document> parents = findDocumentPath(parentId);
+        if (Objects.equals(findById(id).getParentId(), parentId)) { //已在目标目录中
+            return false;
+        }
+
+        List<Document> parents = findParentsDocuments2(parentId); //子目录
 
         for(Document document : parents) {
             if (Objects.equals(id, document.getId())) {
@@ -560,6 +597,7 @@ public class DocumentService extends BaseService<Document> {
     private long recursionDoc(Document document, Long parentId) {
         Document _document = SerializationUtils.clone(document);
         _document.setId(null);
+        _document.setFullName(getUniqueName(parentId, _document.getFileType(), _document.getFullName())); //防止名称冲突
         _document.setParentId(parentId);
 
         save(_document);
