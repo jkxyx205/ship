@@ -42,7 +42,7 @@ public class PanAuthority extends BaseEntity {
     private PermissionType permissionType;
 
     public static enum PermissionType {
-        RENAME, UPLOAD, DELETE, READ, DOWNLOAD, LIST, AUTHORITY
+        RENAME, UPLOAD, DELETE, READ, DOWNLOAD, CD, LIST, AUTHORITY
     }
 
     @Override

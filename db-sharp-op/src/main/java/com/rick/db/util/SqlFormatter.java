@@ -22,7 +22,7 @@ public class SqlFormatter {
 	
 	private static final int QUERY_IN_MAX_COUNT = 1000;
 		
-	private static final String COLUNM_REGEX = "((?i)(to_char|NVL)?\\s*([(][^([(]|[)])]*[)])|[a-zA-Z0-9'[\\.]_[-]]+)";
+	private static final String COLUMN_REGEX = "((?i)(to_char|NVL)?\\s*([(][^([(]|[)])]*[)])|[a-zA-Z0-9'[\\.]_[-]]+)";
 	
 	private static final String OPER_REGEX = "(?i)(like|!=|>=|<=|<|>|=|\\s+in|\\s+not\\s+in)";
 	
@@ -32,9 +32,9 @@ public class SqlFormatter {
 	
 	private static final String OPER_IN_REGEX = "(?i)(\\s+in|\\s+not\\s+in)";
 	
-	private static final String FULL_REGIX = new StringBuilder().append(COLUNM_REGEX).append("\\s*").append(OPER_REGEX).append("\\s*").append(HOLDER_REGEX).toString();
+	private static final String FULL_REGEX = new StringBuilder().append(COLUMN_REGEX).append("\\s*").append(OPER_REGEX).append("\\s*").append(HOLDER_REGEX).toString();
 	
-	private static final String IN_FULL_REGIX = new StringBuilder().append(COLUNM_REGEX).append("\\s*").append(OPER_IN_REGEX).append("\\s*")
+	private static final String IN_FULL_REGEX = new StringBuilder().append(COLUMN_REGEX).append("\\s*").append(OPER_IN_REGEX).append("\\s*")
 		    .append("[(][^)]+[)]").toString();
 	
 	private static final Map<String,String> DATE_FORMAT_MAP;
@@ -50,7 +50,7 @@ public class SqlFormatter {
 		List<String> names = parsedSql.getParameterNames();
 		
 		if(formatMap == null || param == null) {
-			srcSql =  srcSql.replaceAll(FULL_REGIX, "1 = 1");
+			srcSql =  srcSql.replaceAll(FULL_REGEX, "1 = 1");
 			formatMap = Collections.emptyMap();
 			param = Collections.emptyMap();
 		} else {
@@ -160,7 +160,7 @@ public class SqlFormatter {
 	}
 	
 	private static List<ParamHolder> splitParam(String sql) {
-		Pattern pat = Pattern.compile(FULL_REGIX);  
+		Pattern pat = Pattern.compile(FULL_REGEX);
 		Matcher mat = pat.matcher(sql);  
 		List<ParamHolder> paramList = new ArrayList<ParamHolder>();
 		
@@ -169,7 +169,7 @@ public class SqlFormatter {
 			 String matchRet = mat.group().trim();
 			 holder.full = matchRet;
 			 //再进行拆分
-			 Pattern pat1 = Pattern.compile("^" + COLUNM_REGEX);  
+			 Pattern pat1 = Pattern.compile("^" + COLUMN_REGEX);
 			 Matcher mat1 = pat1.matcher(matchRet);
 			 while(mat1.find()) {
 				 String matchRet1 = mat1.group().trim();
@@ -231,7 +231,7 @@ public class SqlFormatter {
     }
    
    public static String changeInSQL(String sql) {
-		Pattern pat = Pattern.compile(IN_FULL_REGIX);  
+		Pattern pat = Pattern.compile(IN_FULL_REGEX);
 		Matcher mat = pat.matcher(sql);  
 
 		while (mat.find()) {
@@ -239,7 +239,7 @@ public class SqlFormatter {
 			 String matchRet = mat.group().trim();
 			 holder.full = matchRet;
 			 //再进行拆分
-			 Pattern pat1 = Pattern.compile("^" + COLUNM_REGEX);  
+			 Pattern pat1 = Pattern.compile("^" + COLUMN_REGEX);
 			 Matcher mat1 = pat1.matcher(matchRet);
 			 while(mat1.find()) {
 				 String matchRet1 = mat1.group().trim();

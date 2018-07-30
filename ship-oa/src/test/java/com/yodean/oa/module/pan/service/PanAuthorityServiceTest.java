@@ -92,5 +92,18 @@ public class PanAuthorityServiceTest {
         Assert.assertFalse(result2);
     }
 
+    @Test
+    public void testDisableInherit() {
+        panAuthorityService.disableInherit(153268302793603L);
+    }
 
+    @Test
+    public void testEnableInherit() {
+        panAuthorityService.enableInherit(153268302793603L);
+    }
+
+    @Test
+    public void testBuildCdAuthority() {
+        panAuthorityService.buildCdAuthority(153270039008161L);
+    }
 }
