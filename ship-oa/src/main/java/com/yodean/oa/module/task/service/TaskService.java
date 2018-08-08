@@ -10,7 +10,6 @@ import com.yodean.oa.module.task.repository.TaskLogRepository;
 import com.yodean.oa.module.task.repository.TaskRepository;
 import com.yodean.platform.domain.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,7 +19,7 @@ import java.util.Objects;
  * Created by rick on 7/18/18.
  */
 @Service
-public class TaskService extends BaseService<Task> {
+public class TaskService extends BaseService<Task, TaskRepository> {
 
     @Autowired
     private DiscussionRepository discussionRepository;
@@ -28,13 +27,6 @@ public class TaskService extends BaseService<Task> {
     @Autowired
     private TaskLogRepository taskLogRepository;
 
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Override
-    protected JpaRepository<Task, Long> autowired() {
-        return taskRepository;
-    }
 
     /**
      * 新建／编辑任务
@@ -65,9 +57,9 @@ public class TaskService extends BaseService<Task> {
      */
     @Transactional
     public void cancelById(Long id) {
-        Task task = taskRepository.getOne(id);
+        Task task = jpaRepository.getOne(id);
         task.setDelFlag(DelFlag.DEL_FLAG_CLEAN);
-        taskRepository.save(task);
+        jpaRepository.save(task);
 
         String log =  String.format("用户%s取消任务", UserUtils.getCurrentEmployee().getName());
 

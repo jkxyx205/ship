@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
 
         if (e instanceof  OAException) {
             OAException ex = (OAException)e;
-            result = ResultUtils.error(ex.getCode(), ex.getMsg());
+            result = ResultUtils.error(ex.getMessage(), ex.getCode());
 
         } else if (e instanceof MaxUploadSizeExceededException) {
             result = ResultUtils.error(ResultCode.VALIDATE_ERROR, "文件不能超过5M");

@@ -7,7 +7,6 @@ import com.yodean.oa.module.inbox.service.UserInboxService;
 import com.yodean.oa.module.meeting.entity.Meeting;
 import com.yodean.oa.module.meeting.repository.MeetingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -16,18 +15,13 @@ import javax.transaction.Transactional;
  * Created by rick on 7/18/18.
  */
 @Service
-public class MeetingService extends BaseService<Meeting> {
+public class MeetingService extends BaseService<Meeting, MeetingRepository> {
     @Autowired
     private MeetingRepository meetingRepository;
 
     @Autowired
     private UserInboxService userInboxService;
 
-
-    @Override
-    protected JpaRepository<Meeting, Long> autowired() {
-        return meetingRepository;
-    }
 
     @Transactional
     public Meeting save(Meeting meeting) {

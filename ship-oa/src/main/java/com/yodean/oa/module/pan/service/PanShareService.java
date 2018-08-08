@@ -6,7 +6,6 @@ import com.yodean.oa.common.plugin.document.service.DocumentService;
 import com.yodean.oa.module.pan.entity.PanShare;
 import com.yodean.oa.module.pan.repository.PanShareRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -21,18 +20,9 @@ import javax.transaction.Transactional;
  * @Copyright: 2018 www.yodean.com. All rights reserved.
  */
 @Service
-public class PanShareService extends BaseService<PanShare> {
-    @Autowired
-    private PanShareRepository panShareRepository;
-
+public class PanShareService extends BaseService<PanShare, PanShareRepository> {
     @Autowired
     private DocumentService documentService;
-
-
-    @Override
-    protected JpaRepository<PanShare, Long> autowired() {
-        return panShareRepository;
-    }
 
     /**
      * 添加共享文件夹

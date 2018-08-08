@@ -19,7 +19,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
@@ -41,10 +40,7 @@ import java.util.zip.ZipOutputStream;
  * Created by rick on 2018/3/22.
  */
 @Service
-public class DocumentService extends BaseService<Document> {
-
-    @Resource
-    private DocumentRepository documentRepository;
+public class DocumentService extends BaseService<Document, DocumentRepository> {
 
     @Resource
     private DocumentHandler documentHandler;
@@ -288,7 +284,7 @@ public class DocumentService extends BaseService<Document> {
         document.setDelFlag(DelFlag.DEL_FLAG_NORMAL);
 
         Example<Document> example = Example.of(document);
-        return documentRepository.findOne(example).get();
+        return jpaRepository.findOne(example).get();
     }
 
 
@@ -331,7 +327,7 @@ public class DocumentService extends BaseService<Document> {
         document.setDelFlag(DelFlag.DEL_FLAG_NORMAL);
 
         Example example = Example.of(document);
-        return documentRepository.findAll(example);
+        return jpaRepository.findAll(example);
     }
 
     /**
@@ -363,7 +359,7 @@ public class DocumentService extends BaseService<Document> {
      * @return
      */
     public List<Document> findDocumentByExample(Example example) {
-        return documentRepository.findAll(example);
+        return jpaRepository.findAll(example);
     }
 
     /**
@@ -614,14 +610,9 @@ public class DocumentService extends BaseService<Document> {
 
 
     @Override
-    protected JpaRepository<Document, Long> autowired() {
-        return documentRepository;
-    }
-
-    @Override
     public Document findById(Long id) {
 
-        Optional<Document> optional = documentRepository.findById(id);
+        Optional<Document> optional = jpaRepository.findById(id);
         if (!optional.isPresent()) {
             throw new OAException(ExceptionCode.NOT_FOUND_ERROR);
         }

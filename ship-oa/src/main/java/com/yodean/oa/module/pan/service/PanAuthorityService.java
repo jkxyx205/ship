@@ -2,7 +2,6 @@ package com.yodean.oa.module.pan.service;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.rick.db.service.JdbcService;
 import com.yodean.oa.common.core.service.BaseService;
 import com.yodean.oa.common.exception.OAException;
 import com.yodean.oa.common.plugin.document.entity.Document;
@@ -17,7 +16,6 @@ import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,7 +38,7 @@ import java.util.Set;
  * @Copyright: 2018 www.yodean.com. All rights reserved.
  */
 @Service
-public class PanAuthorityService extends BaseService<PanAuthority> {
+public class PanAuthorityService extends BaseService<PanAuthority, PanAuthorityRepository> {
 
     public static final Logger logger = LoggerFactory.getLogger(PanAuthorityService.class);
 
@@ -50,10 +48,6 @@ public class PanAuthorityService extends BaseService<PanAuthority> {
     @Autowired
     private DocumentService documentService;
 
-    @Autowired
-    private JdbcService jdbcService;
-
-
 
     private static final String AUTHORITY_SQL = "select document_id documentId, inherit, permission_type  permissionType, employee_id employeeId from oa_pan_authority where document_id = :id and inherit = :inherit";
 
@@ -61,10 +55,6 @@ public class PanAuthorityService extends BaseService<PanAuthority> {
 
     private static final String AUTHORITY_CD_DELETE_SQL= "delete from oa_pan_authority where employee_id in(:empIds) and document_id in(:docIds) and permission_type = 'CD'";
 
-    @Override
-    protected JpaRepository<PanAuthority, Long> autowired() {
-        return panAuthorityRepository;
-    }
 
     /**
      * 新建文件夹
@@ -148,7 +138,7 @@ public class PanAuthorityService extends BaseService<PanAuthority> {
 
         documents.forEach(document -> removeInheritSet.addAll(panAuthorityRepository.findByDocumentIdAndInherit(document.getId(), true)));
 
-        deleteAll(removeInheritSet);
+        jpaRepository.deleteAll(removeInheritSet);
     }
 
     /**
@@ -245,7 +235,7 @@ public class PanAuthorityService extends BaseService<PanAuthority> {
         removePanAuthority.removeAll(expectPanAuthority);
 
         saveAll(expectPanAuthority);
-        deleteAll(removePanAuthority);
+        jpaRepository.deleteAll(removePanAuthority);
 
         //构建CD权限
         buildCdAuthority(panAuthorityDTO.getDocumentId());
@@ -352,7 +342,7 @@ public class PanAuthorityService extends BaseService<PanAuthority> {
             }
         });
 
-        deleteAll(removePanAuthorities); //删除重复的
+        jpaRepository.deleteAll(removePanAuthorities); //删除重复的
         saveAll(uniquePanAuthorities);   //保存非继承状态
 
         Document document = documentService.findById(id);

@@ -13,18 +13,32 @@ public final class ResultUtils {
     }
 
     public static <T> Result<T> success(T data) {
+        return success(data, ResultCode.SUCCESS.getMessage());
+    }
+
+    public static <T> Result<T> success(T data, String msg) {
+        return success(data, ResultCode.SUCCESS.getCode(), msg);
+    }
+
+    public static <T> Result<T> success(T data, ResultCode resultCode) {
+        return success(data, resultCode.getCode(), resultCode.getMessage());
+    }
+
+    public static <T> Result<T> success(T data, Integer code, String msg) {
         Result<T> result = new Result();
+        result.setCode(code);
+        result.setMsg(msg);
         result.setData(data);
-        result.setCode(ResultCode.SUCCESS.getCode());
-        result.setMsg(ResultCode.SUCCESS.getMessage());
+        result.setSuccess(true);
         return result;
     }
 
+
     public static Result<String> error(String msg) {
-        return error(ResultCode.UNKNOW_ERROR.getCode(), msg);
+        return error(msg, ResultCode.UNKNOWN_ERROR.getCode());
     }
 
-    public static Result<String> error(Integer code, String msg) {
+    public static Result<String> error(String msg, Integer code) {
         return error(code, msg, null);
     }
 
@@ -41,6 +55,7 @@ public final class ResultUtils {
         result.setCode(code);
         result.setMsg(msg);
         result.setData(data);
+        result.setSuccess(false);
         return result;
     }
 }

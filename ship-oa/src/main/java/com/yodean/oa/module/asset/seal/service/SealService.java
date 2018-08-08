@@ -8,7 +8,6 @@ import com.yodean.oa.module.asset.seal.repository.SealLogRepository;
 import com.yodean.oa.module.asset.seal.repository.SealRepository;
 import com.yodean.platform.domain.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -18,18 +17,11 @@ import java.util.Date;
  * Created by rick on 7/20/18.
  */
 @Service
-public class SealService extends BaseService<Seal> {
-
-    @Autowired
-    private SealRepository sealRepository;
+public class SealService extends BaseService<Seal, SealRepository> {
 
     @Autowired
     private SealLogRepository sealLogRepository;
 
-    @Override
-    protected JpaRepository<Seal, Long> autowired() {
-        return sealRepository;
-    }
 
     /**
      * 借用|归还
@@ -39,7 +31,7 @@ public class SealService extends BaseService<Seal> {
     public void setSealStatus(Long id, AssetStatus assetStatus) {
         Seal seal = findById(id);
         seal.setAssetStatus(assetStatus);
-        sealRepository.save(seal);
+        jpaRepository.save(seal);
 
         SealLog sealLog = new SealLog();
         sealLog.setSeal(seal);

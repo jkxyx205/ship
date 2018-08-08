@@ -9,7 +9,6 @@ import com.yodean.oa.module.asset.material.entity.*;
 import com.yodean.oa.module.asset.material.repository.MovingRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,10 +19,7 @@ import java.util.Objects;
  * Created by rick on 7/24/18.
  */
 @Service
-public class MovingService extends BaseService<Moving> {
-
-    @Autowired
-    private MovingRepository movingRepository;
+public class MovingService extends BaseService<Moving, MovingRepository> {
 
     @Autowired
     private MaterialService materialService;
@@ -36,11 +32,6 @@ public class MovingService extends BaseService<Moving> {
 
     @Autowired
     private MaterialSerialNumberService materialSerialNumberService;
-
-    @Override
-    protected JpaRepository<Moving, Long> autowired() {
-        return movingRepository;
-    }
 
     @Transactional
     public void moving(MovingDTO movingDTO) {

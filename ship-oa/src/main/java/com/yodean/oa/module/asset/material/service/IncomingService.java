@@ -10,7 +10,6 @@ import com.yodean.oa.module.asset.material.entity.Material;
 import com.yodean.oa.module.asset.material.entity.MaterialUnit;
 import com.yodean.oa.module.asset.material.repository.IncomingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,10 +19,7 @@ import java.util.Objects;
  * Created by rick on 7/24/18.
  */
 @Service
-public class IncomingService extends BaseService<Incoming> {
-
-    @Autowired
-    private IncomingRepository incomingRepository;
+public class IncomingService extends BaseService<Incoming, IncomingRepository> {
 
     @Autowired
     private MaterialService materialService;
@@ -37,10 +33,6 @@ public class IncomingService extends BaseService<Incoming> {
     @Autowired
     private MaterialSerialNumberService materialSerialNumberService;
 
-    @Override
-    protected JpaRepository<Incoming, Long> autowired() {
-        return incomingRepository;
-    }
 
     /**
      * 入库

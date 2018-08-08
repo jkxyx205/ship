@@ -5,7 +5,6 @@ import com.yodean.oa.module.asset.material.entity.Material;
 import com.yodean.oa.module.asset.material.entity.MaterialUnit;
 import com.yodean.oa.module.asset.material.repository.MaterialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -14,18 +13,10 @@ import java.util.Objects;
  * Created by rick on 7/23/18.
  */
 @Service
-public class MaterialService extends BaseService<Material> {
-
-    @Autowired
-    private MaterialRepository materialRepository;
+public class MaterialService extends BaseService<Material, MaterialRepository> {
 
     @Autowired
     private MaterialUnitService materialUnitService;
-
-    @Override
-    protected JpaRepository<Material, Long> autowired() {
-        return materialRepository;
-    }
 
     /**
      * 新增
