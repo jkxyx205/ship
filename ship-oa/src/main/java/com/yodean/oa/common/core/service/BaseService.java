@@ -124,6 +124,4 @@ public abstract class BaseService<T extends BaseEntity> {
             jpaRepository.save(t);
         }
     }
-
-
 }

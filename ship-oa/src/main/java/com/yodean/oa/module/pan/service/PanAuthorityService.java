@@ -491,7 +491,7 @@ public class PanAuthorityService extends BaseService<PanAuthority> {
      * @param ids
      */
     public void download(HttpServletRequest request, HttpServletResponse response, Long ... ids) throws IOException {
-        documentService.download(response, request, ids);
+        documentService.download(request, response, ids);
     }
 
 
@@ -500,7 +500,7 @@ public class PanAuthorityService extends BaseService<PanAuthority> {
      * @param id
      */
     public void view(HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
-        documentService.view(response, request, id);
+        documentService.view(request, response, id);
     }
 
 

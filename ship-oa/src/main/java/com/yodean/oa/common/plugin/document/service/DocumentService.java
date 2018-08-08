@@ -373,7 +373,7 @@ public class DocumentService extends BaseService<Document> {
      * @param ids
      * @throws IOException
      */
-    public void download(HttpServletResponse response, HttpServletRequest request, Long ... ids) throws IOException {
+    public void download(HttpServletRequest request, HttpServletResponse response, Long ... ids) throws IOException {
         Validate.noNullElements(ids);
 
         Document document;
@@ -423,7 +423,7 @@ public class DocumentService extends BaseService<Document> {
 
             ZipUtils.zipDirectoryToZipFile(_home.getAbsolutePath(), root, zipOut);
 
-            os = getResponseOutputStream(response, request, zipName, READ_ATTACHMENT);
+            os = getResponseOutputStream(request, response, zipName, READ_ATTACHMENT);
 
             zipOut.close();
 
@@ -432,7 +432,7 @@ public class DocumentService extends BaseService<Document> {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> FileUtils.deleteQuietly(_home)));
 //           FileUtils.forceDeleteOnExit(_home);
         } else { //单文件下载
-            os = getResponseOutputStream(response, request, document.getFullName(), READ_ATTACHMENT);
+            os = getResponseOutputStream(request, response, document.getFullName(), READ_ATTACHMENT);
             FileCopyUtils.copy(new FileInputStream(document.getFileAbsolutePath()), os);
         }
 
@@ -458,9 +458,9 @@ public class DocumentService extends BaseService<Document> {
      * @param id
      * @throws IOException
      */
-    public void view(HttpServletResponse response, HttpServletRequest request, Long id) throws IOException {
+    public void view(HttpServletRequest request, HttpServletResponse response, Long id) throws IOException {
         Document document = findById(id);
-        OutputStream os = getResponseOutputStream(response, request, document.getFullName(), READ_INLINE);
+        OutputStream os = getResponseOutputStream(request, response, document.getFullName(), READ_INLINE);
         if (document.getFileType() == FileType.FOLDER) {
             throw new OAException(ExceptionCode.FILE_PREVIEW_ERROR);
         } else {
@@ -468,7 +468,7 @@ public class DocumentService extends BaseService<Document> {
         }
     }
 
-    private static OutputStream getResponseOutputStream(HttpServletResponse response, HttpServletRequest request, String fileName, String readType) throws IOException {
+    private static OutputStream getResponseOutputStream(HttpServletRequest request, HttpServletResponse response, String fileName, String readType) throws IOException {
         String _fileName = fileName.replaceAll("[/:*?\"<>[|]]", "");
 
         String browserType = request.getHeader("User-Agent").toLowerCase();

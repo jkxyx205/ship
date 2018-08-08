@@ -125,8 +125,8 @@ public class DocumentController {
      * @return
      */
     @GetMapping(value = "/{id}/download")
-    public void download(HttpServletResponse response, HttpServletRequest request, @PathVariable Long id) throws IOException {
-        documentService.download(response, request, id);
+    public void download(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
+        documentService.download(request, response , id);
     }
 
     /**
@@ -135,8 +135,8 @@ public class DocumentController {
      * @return
      */
     @GetMapping(value = "/download")
-    public void download(HttpServletResponse response, HttpServletRequest request, @RequestParam(name = "id") Long[] ids) throws IOException {
-        documentService.download(response, request, ids);
+    public void download(HttpServletRequest request, HttpServletResponse response, @RequestParam(name = "id") Long[] ids) throws IOException {
+        documentService.download(request, response, ids);
     }
 
     /**
@@ -145,8 +145,8 @@ public class DocumentController {
      * @throws IOException
      */
     @GetMapping(value = "/{id}/preview")
-    public void view(HttpServletResponse response, HttpServletRequest request, @PathVariable Long id) throws IOException {
-        documentService.view(response, request, id);
+    public void view(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
+        documentService.view(request, response, id);
     }
 
 
